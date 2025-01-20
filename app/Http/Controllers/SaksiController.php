@@ -201,4 +201,26 @@ class SaksiController extends Controller
 
         return view('saksi.edit-perdata', compact('saksiList'));
     }
+
+    public function updateIzin(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'id_izin' => 'required|in:1,2',
+        ]);
+
+        // Cari saksi berdasarkan ID
+        $saksi = Saksi::findOrFail($id);
+
+        // Update nilai id_izin
+        $saksi->id_izin = $request->id_izin;
+        $saksi->save();
+
+        // Kirim respons
+        return response()->json([
+            'success' => true,
+            'message' => 'ID izin berhasil diperbarui.',
+            'id_izin' => $saksi->id_izin,
+        ]);
+    }
 }

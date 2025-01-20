@@ -46,4 +46,5 @@ Route::post('/update-status-perkara', [App\Http\Controllers\SaksiController::cla
 Route::get('/saksi/edit-perdata/{no_perkara}/{tgl_kehadiran}', [App\Http\Controllers\SaksiController::class, 'edit'])->name('saksi.edit-perdata');
 Route::put('/saksi/update-perdata/{no_perkara}/{tgl_kehadiran}', [App\Http\Controllers\SaksiController::class, 'update'])->name('saksi.update-perdata');
 Route::get('saksi/search', [App\Http\Controllers\SaksiController::class, 'search'])->name('saksi.search');
+Route::patch('/saksi/{id}/update-izin', [SaksiController::class, 'updateIzin'])->name('saksi.updateIzin');
 require __DIR__ . '/auth.php';

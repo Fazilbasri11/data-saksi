@@ -1,4 +1,5 @@
 <x-app-layout>
+    <script src="https://cdn.tailwindcss.com"></script>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
             {{ __('Edit Data Saksi') }}
@@ -31,7 +32,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach ($saksiList as $saksi)
                         <div class="bg-white shadow-md rounded-lg p-6 transition-transform transform hover:scale-105">
-                            <h3 class="text-lg font-bold">Nama : {{ $saksi->nama_saksi }}</h3>
+                            <h3 class="text-lg font-bold">Nama: {{ $saksi->nama_saksi }}</h3>
                             <p><strong>Tempat Lahir:</strong> {{ $saksi->tempat_lahir }}</p>
                             <p><strong>Tanggal Lahir:</strong>
                                 {{ \Carbon\Carbon::parse($saksi->tanggal_lahir)->format('d-m-Y') }}</p>
@@ -39,14 +40,58 @@
                             <p><strong>No HP:</strong> {{ $saksi->no_hp }}</p>
                             <p><strong>Jenis Kelamin:</strong>
                                 {{ $saksi->id_jeniskelamin == 1 ? 'Laki-laki' : 'Perempuan' }}</p>
-                            {{-- <p><strong>Created At:</strong>
-                                {{ \Carbon\Carbon::parse($saksi->created_at)->format('d-m-Y H:i:s') }}</p>
-                            <p><strong>Updated At:</strong>
-                                {{ \Carbon\Carbon::parse($saksi->updated_at)->format('d-m-Y H:i:s') }}</p> --}}
+
+                            <!-- Switch for id_izin -->
+                            <div class="mt-4 flex items-center">
+                                <span class="mr-2">Izin:</span>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="checkbox" class="toggle-izin" data-id="{{ $saksi->id }}"
+                                        {{ $saksi->id_izin == 1 ? 'checked' : '' }} />
+                                    <span class="ml-2">{{ $saksi->id_izin == 1 ? 'Aktif' : 'Nonaktif' }}</span>
+                                </label>
+                            </div>
                         </div>
                     @endforeach
                 </div>
             @endif
         </div>
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).on('change', '.toggle-izin', function() {
+            const saksiId = $(this).data('id');
+            const newIzin = $(this).is(':checked') ? 1 : 2;
+
+            $.ajax({
+                url: `/saksi/${saksiId}/update-izin`,
+                method: 'PATCH',
+                data: {
+                    id_izin: newIzin,
+                    _token: '{{ csrf_token() }}',
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            title: 'Berhasil!',
+                            text: 'Status izin berhasil diperbarui menjadi ' +
+                                (newIzin === 1 ? 'Aktif' : 'Nonaktif'),
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false,
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: xhr.responseJSON?.message ||
+                            'Terjadi kesalahan saat memperbarui izin.',
+                        icon: 'error',
+                    });
+                },
+            });
+        });
+    </script>
+
+
 </x-app-layout>
