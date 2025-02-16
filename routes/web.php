@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SaksiController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NoPerkaraPerdataController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,6 +24,7 @@ Route::get('/', function () {
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+Route::resource('no_perkara', NoPerkaraPerdataController::class);
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -43,8 +45,8 @@ Route::post('/update-status-perkara', [App\Http\Controllers\SaksiController::cla
 
 
 // edit saksi
-Route::get('/saksi/edit-perdata/{no_perkara}/{tgl_kehadiran}', [App\Http\Controllers\SaksiController::class, 'edit'])->name('saksi.edit-perdata');
-Route::put('/saksi/update-perdata/{no_perkara}/{tgl_kehadiran}', [App\Http\Controllers\SaksiController::class, 'update'])->name('saksi.update-perdata');
+Route::get('/saksi/edit-perdata/{id_no_perkara}/{tgl_kehadiran}', [App\Http\Controllers\SaksiController::class, 'edit'])->name('saksi.edit-perdata');
+Route::put('/saksi/update-perdata/{id_no_perkara}/{tgl_kehadiran}', [App\Http\Controllers\SaksiController::class, 'update'])->name('saksi.update-perdata');
 Route::get('saksi/search', [App\Http\Controllers\SaksiController::class, 'search'])->name('saksi.search');
 Route::patch('/saksi/{id}/update-izin', [SaksiController::class, 'updateIzin'])->name('saksi.updateIzin');
 require __DIR__ . '/auth.php';

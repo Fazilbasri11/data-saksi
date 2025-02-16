@@ -19,8 +19,20 @@
                     <p><strong>No Perkara:</strong> {{ $saksiList->first()->no_perkara }}</p>
                     <p><strong>Tanggal Kehadiran:</strong>
                         {{ \Carbon\Carbon::parse($saksiList->first()->tgl_kehadiran)->format('d-m-Y') }}</p>
-                    <p><strong>Status Perkara:</strong> {{ $saksiList->first()->id_status_perkara }}</p>
-                    <p><strong>Jenis Perkara:</strong> {{ $saksiList->first()->id_jenis_perkara }}</p>
+
+                    <p><strong>Status Perkara:</strong>
+                        @if ($saksiList->first()->id_status_perkara == 1)
+                            Selesai
+                        @elseif ($saksiList->first()->id_status_perkara == 2)
+                            Berlangsung
+                        @else
+                            N/A
+                        @endif
+                    </p>
+
+                    <p><strong>Jenis Perkara:</strong>
+                        {{ optional($saksiList->first()->jenisPerkara)->jenis ?? 'N/A' }}
+                    </p>
                 </div>
                 <div class="bg-gray-100 p-4 rounded-lg mb-6">
                     <form method="GET" action="{{ route('saksi.search') }}" class="flex items-center">
@@ -33,6 +45,7 @@
                     @foreach ($saksiList as $saksi)
                         <div class="bg-white shadow-md rounded-lg p-6 transition-transform transform hover:scale-105">
                             <h3 class="text-lg font-bold">Nama: {{ $saksi->nama_saksi }}</h3>
+                            <p><strong>Pihak:</strong> {{ $saksi->pihak->jenis }}</p>
                             <p><strong>Tempat Lahir:</strong> {{ $saksi->tempat_lahir }}</p>
                             <p><strong>Tanggal Lahir:</strong>
                                 {{ \Carbon\Carbon::parse($saksi->tanggal_lahir)->format('d-m-Y') }}</p>

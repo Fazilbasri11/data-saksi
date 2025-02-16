@@ -9,6 +9,7 @@ use App\Models\StatusPerkara;
 use App\Models\JenisKelamin;
 use App\Models\Pihak;
 use App\Models\Perdata;
+use App\Models\NoPerkaraPerdata;
 use Illuminate\Http\Request;
 
 
@@ -19,7 +20,10 @@ class SaksiController extends Controller
      */
     public function index(Request $request)
     {
-        // Data relasi untuk dropdown
+        // Ambil semua nomor perkara untuk dropdown
+        $noPerkara = NoPerkaraPerdata::all();
+
+        // Data relasi lainnya
         $jenisPerkara = JenisPerkara::all();
         $statusPerkara = StatusPerkara::all();
         $jenisKelamin = JenisKelamin::all();
@@ -28,11 +32,11 @@ class SaksiController extends Controller
 
         // Cek apakah ada data berdasarkan nomor perkara dan tanggal hari ini
         $today = now()->toDateString();
-        $saksi = Saksi::where('no_perkara', $request->input('no_perkara'))
+        $saksi = Saksi::where('id_no_perkara', $request->input('id_no_perkara'))
             ->whereDate('tgl_kehadiran', $today)
             ->first();
 
-        return view('saksi.form-perdata', compact('saksi', 'jenisPerkara', 'pihak', 'perdata', 'statusPerkara', 'jenisKelamin'));
+        return view('saksi.form-perdata', compact('saksi', 'jenisPerkara', 'pihak', 'perdata', 'statusPerkara', 'jenisKelamin', 'noPerkara'));
     }
 
     /**
@@ -45,8 +49,9 @@ class SaksiController extends Controller
             'id_jenis_perkara' => 'required|integer',
             'id_pihak' => 'required|integer',
             'id_perdata' => 'required|integer',
-            'no_perkara' => 'required|string|max:255',
+            'id_no_perkara' => 'required|string|max:255',
             'tgl_kehadiran' => 'required|date',
+            'akan_hadir' => 'required|integer',
             'permohonan' => 'nullable|string|max:255',
             'gugatan' => 'nullable|string|max:255',
         ]);
@@ -69,10 +74,11 @@ class SaksiController extends Controller
                 'id_jenis_perkara' => $request->id_jenis_perkara,
                 'id_pihak' => $request->id_pihak,
                 'id_perdata' => $request->id_perdata,
-                'no_perkara' => $request->no_perkara,
+                'id_no_perkara' => $request->id_no_perkara,
                 'tgl_kehadiran' => $request->tgl_kehadiran,
                 'permohonan' => $request->permohonan,
                 'gugatan' => $request->gugatan,
+                'akan_hadir' => $request->akan_hadir,
                 'nama_saksi' => $saksiData['nama_saksi'],
                 'tempat_lahir' => $saksiData['tempat_lahir'],
                 'tanggal_lahir' => $saksiData['tanggal_lahir'],
@@ -91,12 +97,12 @@ class SaksiController extends Controller
         try {
             // Validasi request
             $request->validate([
-                'no_perkara' => 'required',
+                'id_no_perkara' => 'required',
                 'tgl_kehadiran' => 'required|date'
             ]);
 
             // Cek status sekarang di database
-            $saksi = Saksi::where('no_perkara', $request->no_perkara)
+            $saksi = Saksi::where('id_no_perkara', $request->id_no_perkara)
                 ->where('tgl_kehadiran', $request->tgl_kehadiran)
                 ->first();
 
@@ -111,7 +117,7 @@ class SaksiController extends Controller
             $newStatus = $saksi->id_status_perkara == 1 ? 2 : 1;
 
             // Update status
-            $updated = Saksi::where('no_perkara', $request->no_perkara)
+            $updated = Saksi::where('id_no_perkara', $request->id_no_perkara)
                 ->where('tgl_kehadiran', $request->tgl_kehadiran)
                 ->update(['id_status_perkara' => $newStatus]);
 
@@ -128,17 +134,22 @@ class SaksiController extends Controller
         }
     }
 
-    public function edit($no_perkara, $tgl_kehadiran)
+    public function edit($id_no_perkara, $tgl_kehadiran)
     {
         // Ambil semua data saksi dengan no_perkara dan tgl_kehadiran yang sama
-        $saksiList = Saksi::where('no_perkara', $no_perkara)
+        $saksiList = Saksi::with(['jenisPerkara', 'statusPerkara']) // Eager load relationships
+            ->where('id_no_perkara', $id_no_perkara)
             ->where('tgl_kehadiran', $tgl_kehadiran)
             ->get();
+
+        // Debugging: Check the retrieved data
         // dd($saksiList);
+
+        // Return the view with the retrieved data
         return view('saksi.edit-perdata', compact('saksiList'));
     }
 
-    public function update(Request $request, $no_perkara, $tgl_kehadiran)
+    public function update(Request $request, $id_no_perkara, $tgl_kehadiran)
     {
         $request->validate([
             'jumlah_saksi_penggugat' => 'required|integer|min:0',
@@ -151,7 +162,7 @@ class SaksiController extends Controller
         try {
             // Update atau create data saksi penggugat
             $this->updateSaksiData(
-                $no_perkara,
+                $id_no_perkara,
                 $tgl_kehadiran,
                 2,
                 $request->jumlah_saksi_penggugat,
@@ -160,7 +171,7 @@ class SaksiController extends Controller
 
             // Update atau create data saksi tergugat
             $this->updateSaksiData(
-                $no_perkara,
+                $id_no_perkara,
                 $tgl_kehadiran,
                 1,
                 $request->jumlah_saksi_tergugat,
@@ -175,10 +186,10 @@ class SaksiController extends Controller
         }
     }
 
-    private function updateSaksiData($no_perkara, $tgl_kehadiran, $id_pihak, $jumlah_saksi, $jumlah_izin)
+    private function updateSaksiData($id_no_perkara, $tgl_kehadiran, $id_pihak, $jumlah_saksi, $jumlah_izin)
     {
         // Hapus data yang ada
-        Saksi::where('no_perkara', $no_perkara)
+        Saksi::where('id_no_perkara', $id_no_perkara)
             ->where('tgl_kehadiran', $tgl_kehadiran)
             ->where('id_pihak', $id_pihak)
             ->delete();
@@ -186,7 +197,7 @@ class SaksiController extends Controller
         // Insert data baru
         for ($i = 0; $i < $jumlah_saksi; $i++) {
             Saksi::create([
-                'no_perkara' => $no_perkara,
+                'id_no_perkara' => $id_no_perkara,
                 'tgl_kehadiran' => $tgl_kehadiran,
                 'id_pihak' => $id_pihak,
                 'id_izin' => $i < $jumlah_izin ? 2 : 1

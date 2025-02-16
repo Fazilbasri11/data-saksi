@@ -21,8 +21,9 @@ class Saksi extends Model
         'id_status_perkara',
         'id_pihak',
         'id_perdata',
-        'no_perkara',
+        'id_no_perkara',
         'tgl_kehadiran',
+        'akan_hadir',
         'nama_saksi',
         'tempat_lahir',
         'tanggal_lahir',
@@ -70,5 +71,10 @@ class Saksi extends Model
     public function izin()
     {
         return $this->belongsTo(Izin::class, 'id_izin');
+    }
+
+    public function noPerkara()
+    {
+        return $this->belongsTo(NoPerkaraPerdata::class, 'id_no_perkara');
     }
 }

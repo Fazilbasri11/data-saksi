@@ -12,7 +12,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Saksi App</a>
+            <a class="navbar-brand" href="#">Pendataan Saksi</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -20,13 +20,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contact</a>
+                        <a class="nav-link active" aria-current="page" href="/">Home</a>
                     </li>
                 </ul>
             </div>
@@ -48,11 +42,17 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="no_perkara" class="form-label">Nomor Perkara</label>
-                                <input type="text" class="form-control" id="no_perkara" name="no_perkara"
-                                    value="{{ old('no_perkara', $saksi->no_perkara ?? '') }}" required>
+                                <label for="id_no_perkara" class="form-label">Nomor Perkara</label>
+                                <select class="form-control" id="id_no_perkara" name="id_no_perkara" required>
+                                    <option value="">Pilih Nomor Perkara</option>
+                                    @foreach ($noPerkara as $perkara)
+                                        <option value="{{ $perkara->id }}"
+                                            {{ old('id_no_perkara', $saksi->id_no_perkara ?? '') == $perkara->id ? 'selected' : '' }}>
+                                            {{ $perkara->no }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
-
                             <div class="mb-3">
                                 <label for="id_jenis_perkara" class="form-label">Jenis Perkara</label>
                                 <input type="hidden" id="id_jenis_perkara" name="id_jenis_perkara"
@@ -82,7 +82,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="id_pihak" class="form-label">Pihak</label>
+                                <label for="id_pihak" class="form-label">Pihak Yang Menghadirkan</label>
                                 <select class="form-select" id="id_pihak" name="id_pihak" required>
                                     <option value="">Pilih Pihak</option>
                                     @foreach ($pihak as $jenis)
@@ -100,6 +100,10 @@
                                     name="tgl_kehadiran"
                                     value="{{ old('tgl_kehadiran', $saksi->tgl_kehadiran ?? now()->toDateString()) }}"
                                     required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="tgl_kehadiran" class="form-label">Jumlah Saksi Akan Hadir</label>
+                                <input type="number" class="form-control" id="akan_hadir" name="akan_hadir" required>
                             </div>
                         </div>
                     </div>
