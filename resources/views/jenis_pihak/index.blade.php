@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('No Perkara Perdata') }}
+            {{ __('Data Jenis Pihak') }}
         </h2>
     </x-slot>
     <!-- Tambahkan CSS DataTables -->
@@ -15,8 +15,8 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="flex justify-between mb-4">
-                    <a href="{{ route('pihak_menghadirkan.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded">
-                        Tambah No Perkara Perdata
+                    <a href="{{ route('jenis_pihak.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded">
+                        Tambah Jenis Pihak
                     </a>
                 </div>
 
@@ -30,27 +30,28 @@
                         <thead class="table-light">
                             <tr>
                                 <th class="py-2 px-4 border-b">No</th>
-                                <th class="py-2 px-4 border-b">No Perkara</th>
+                                <th class="py-2 px-4 border-b">Jenis Pihak</th>
+                                <th class="py-2 px-4 border-b">Nama</th>
                                 <th class="py-2 px-4 border-b">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($noPerkara as $no)
+                            @foreach ($pihak as $no)
                                 <tr class="hover:bg-gray-100">
                                     <td class="py-2 px-4 border-b">{{ $loop->iteration }}</td>
                                     <!-- Penomoran otomatis -->
-                                    <td class="py-2 px-4 border-b">{{ $no->no }}</td>
+                                    <td class="py-2 px-4 border-b">{{ $no->jenispihak->jenis ?? '-' }}</td>
+                                    <td class="py-2 px-4 border-b">{{ $no->nama }}</td>
                                     <td class="py-2 px-4 border-b">
-                                        {{-- <a href="{{ route('no_perkara.edit', $no->id) }}"
+                                        {{-- <a href="{{ route('pihak_menghadirkan.edit', $no->id) }}"
                                             class="bg-yellow-500 text-white px-2 py-1 rounded">Edit</a> --}}
-                                        <form action="{{ route('no_perkara.destroy', $no->id) }}" method="POST"
-                                            class="delete-form" data-id="{{ $no->id }}" style="display:inline;">
+                                        <form action="{{ route('jenis_pihak.destroy', $no->id) }}" method="POST"
+                                            class="delete-form inline-block" data-id="{{ $no->id }}">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button"
                                                 class="bg-red-500 text-white px-2 py-1 rounded delete-btn">Hapus</button>
                                         </form>
-
                                     </td>
                                 </tr>
                             @endforeach

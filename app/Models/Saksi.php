@@ -20,6 +20,7 @@ class Saksi extends Model
         'id_jenis_perkara',
         'id_status_perkara',
         'id_pihak',
+        'id_jenis_pihak',
         'id_perdata',
         'id_no_perkara',
         'tgl_kehadiran',

@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PihakMenghadirkan;
-use App\Models\Pihak;
+use App\Models\DataJenisPihak;
+use App\Models\JenisPihak;
 use Illuminate\Http\Request;
 
-class PihakMenghadirkanController extends Controller
+class DataJenisPihakController extends Controller
 {
     public function index()
     {
-        $pihak = PihakMenghadirkan::all();
+        $pihak = DataJenisPihak::all();
         // dd($pihak);
-        return view('pihak_menghadirkan.index', compact('pihak'));
+        return view('jenis_pihak.index', compact('pihak'));
     }
 
     public function create()
     {
-        $pihaks = Pihak::all();
+        $pihaks = JenisPihak::all();
         // dd($pihaks);
-        return view('pihak_menghadirkan.create', compact('pihaks'));
+        return view('jenis_pihak.create', compact('pihaks'));
     }
 
     public function store(Request $request)
@@ -31,51 +31,49 @@ class PihakMenghadirkanController extends Controller
             'nama'    => 'required|array',
             'nama.*'  => 'required|string|max:255'
         ]);
-        // dd($request->all());
 
         try {
             // Simpan semua data dalam loop
             foreach ($request->pihak as $key => $id_pihak) {
-                PihakMenghadirkan::create([
-                    'id_pihak' => $id_pihak,
+                DataJenisPihak::create([
+                    'id_jenis_pihak' => $id_pihak,
                     'nama'     => $request->nama[$key]
                 ]);
             }
 
             // Set pesan sukses
-            return redirect()->route('pihak_menghadirkan.index')->with('success', 'Data berhasil disimpan!');
+            return redirect()->route('jenis_pihak.index')->with('success', 'Data berhasil disimpan!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menyimpan data: ' . $e->getMessage());
         }
     }
 
 
-
-    public function show(PihakMenghadirkan $noPerkaraPerdata)
+    public function show(DataJenisPihak $noPerkaraPerdata)
     {
-        return view('pihak_menghadirkan.show', compact('noPerkaraPerdata'));
+        return view('jenis_pihak.show', compact('noPerkaraPerdata'));
     }
 
-    public function edit(PihakMenghadirkan $noPerkaraPerdata)
+    public function edit(DataJenisPihak $noPerkaraPerdata)
     {
-        return view('pihak_menghadirkan.edit', compact('noPerkaraPerdata'));
+        return view('jenis_pihak.edit', compact('noPerkaraPerdata'));
     }
 
-    public function update(Request $request, PihakMenghadirkan $noPerkaraPerdata)
+    public function update(Request $request, DataJenisPihak $noPerkaraPerdata)
     {
         $request->validate([
             'no' => 'required|string|max:255',
         ]);
 
         $noPerkaraPerdata->update($request->all());
-        return redirect()->route('pihak_menghadirkan.index')->with('success', 'No Perkara berhasil diperbarui.');
+        return redirect()->route('jenis_pihak.index')->with('success', 'No Perkara berhasil diperbarui.');
     }
 
     public function destroy($id)
     {
-        $noPerkaraPerdata = PihakMenghadirkan::findOrFail($id);
+        $noPerkaraPerdata = DataJenisPihak::findOrFail($id);
         $noPerkaraPerdata->delete();
 
-        return redirect()->route('pihak_menghadirkan.index')->with('success', 'Data berhasil dihapus.');
+        return redirect()->route('jenis_pihak.index')->with('success', 'Data berhasil dihapus.');
     }
 }

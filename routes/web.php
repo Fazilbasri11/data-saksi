@@ -4,7 +4,9 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SaksiController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DataJenisPihakController;
 use App\Http\Controllers\NoPerkaraPerdataController;
+use App\Http\Controllers\PihakMenghadirkanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,6 +28,9 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->name('dashboard');
 Route::resource('no_perkara', NoPerkaraPerdataController::class);
 
+Route::resource('pihak_menghadirkan', PihakMenghadirkanController::class);
+Route::resource('jenis_pihak', DataJenisPihakController::class);
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -38,7 +43,6 @@ Route::get('/saksi-perdata', [SaksiController::class, 'index'])->name('saksi.ind
 
 // Rute untuk menyimpan atau memperbarui data
 Route::post('/saksi-perdata', [SaksiController::class, 'store'])->name('saksi.store');
-
 
 // edit status perkara perdata
 Route::post('/update-status-perkara', [App\Http\Controllers\SaksiController::class, 'updateStatusPerkara'])->name('update.status.perkara');

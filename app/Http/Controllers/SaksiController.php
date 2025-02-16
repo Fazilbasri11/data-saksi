@@ -7,7 +7,7 @@ use App\Models\Saksi;
 use App\Models\JenisPerkara;
 use App\Models\StatusPerkara;
 use App\Models\JenisKelamin;
-use App\Models\Pihak;
+use App\Models\PihakMenghadirkan;
 use App\Models\Perdata;
 use App\Models\NoPerkaraPerdata;
 use Illuminate\Http\Request;
@@ -27,7 +27,10 @@ class SaksiController extends Controller
         $jenisPerkara = JenisPerkara::all();
         $statusPerkara = StatusPerkara::all();
         $jenisKelamin = JenisKelamin::all();
-        $pihak = Pihak::all();
+        $pihakMenghadirkan = PihakMenghadirkan::with('pihak')->get();
+
+        // dd($pihakMenghadirkan);
+
         $perdata = Perdata::all();
 
         // Cek apakah ada data berdasarkan nomor perkara dan tanggal hari ini
@@ -36,7 +39,7 @@ class SaksiController extends Controller
             ->whereDate('tgl_kehadiran', $today)
             ->first();
 
-        return view('saksi.form-perdata', compact('saksi', 'jenisPerkara', 'pihak', 'perdata', 'statusPerkara', 'jenisKelamin', 'noPerkara'));
+        return view('saksi.form-perdata', compact('saksi', 'jenisPerkara', 'pihakMenghadirkan', 'perdata', 'statusPerkara', 'jenisKelamin', 'noPerkara'));
     }
 
     /**
@@ -44,35 +47,42 @@ class SaksiController extends Controller
      */
     public function store(Request $request)
     {
+
         // Validate common fields
-        $request->validate([
-            'id_jenis_perkara' => 'required|integer',
-            'id_pihak' => 'required|integer',
-            'id_perdata' => 'required|integer',
-            'id_no_perkara' => 'required|string|max:255',
-            'tgl_kehadiran' => 'required|date',
-            'akan_hadir' => 'required|integer',
-            'permohonan' => 'nullable|string|max:255',
-            'gugatan' => 'nullable|string|max:255',
-        ]);
+        // $request->validate([
+        //     'id_jenis_perkara' => 'required|integer',
+        //     'id_pihak' => 'required|integer',
+        //     'id_perdata' => 'required|integer',
+        //     'id_no_perkara' => 'required|string|max:255',
+        //     'tgl_kehadiran' => 'required|date',
+        //     'akan_hadir' => 'required|integer',
+        //     'permohonan' => 'nullable|string|max:255',
+        //     'gugatan' => 'nullable|string|max:255',
+        // ]);
+        // Pisahkan value yang dikirim dari form
+        list($id_jenis_pihak, $id_pihak) = explode('|', $request->input('id_pihak'));
+
 
         // Validate each saksi entry
-        foreach ($request->saksi as $index => $saksiData) {
-            $request->validate([
-                "saksi.$index.nama_saksi" => 'required|string|max:255',
-                "saksi.$index.tempat_lahir" => 'required|string|max:255',
-                "saksi.$index.tanggal_lahir" => 'required|date',
-                "saksi.$index.id_jeniskelamin" => 'required|integer',
-                "saksi.$index.alamat" => 'required|string|max:255',
-                "saksi.$index.no_hp" => 'required|string|max:255',
-            ]);
-        }
+        // foreach ($request->saksi as $index => $saksiData) {
+        //     $request->validate([
+        //         "saksi.$index.nama_saksi" => 'required|string|max:255',
+        //         "saksi.$index.tempat_lahir" => 'required|string|max:255',
+        //         "saksi.$index.tanggal_lahir" => 'required|date',
+        //         "saksi.$index.id_jeniskelamin" => 'required|integer',
+        //         "saksi.$index.alamat" => 'required|string|max:255',
+        //         "saksi.$index.no_hp" => 'required|string|max:255',
+        //     ]);
+        // }
+
+
 
         // Simpan data saksi
         foreach ($request->saksi as $saksiData) {
             Saksi::create([
                 'id_jenis_perkara' => $request->id_jenis_perkara,
-                'id_pihak' => $request->id_pihak,
+                'id_jenis_pihak' => $id_jenis_pihak,  // Simpan id_jenis_pihak
+                'id_pihak' => $id_pihak,  // Simpan id_pihak
                 'id_perdata' => $request->id_perdata,
                 'id_no_perkara' => $request->id_no_perkara,
                 'tgl_kehadiran' => $request->tgl_kehadiran,

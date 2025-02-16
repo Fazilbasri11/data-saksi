@@ -84,11 +84,11 @@
                             <div class="mb-3">
                                 <label for="id_pihak" class="form-label">Pihak Yang Menghadirkan</label>
                                 <select class="form-select" id="id_pihak" name="id_pihak" required>
-                                    <option value="">Pilih Pihak</option>
-                                    @foreach ($pihak as $jenis)
-                                        <option value="{{ $jenis->id }}"
-                                            {{ old('id_pihak', $saksi->id_pihak ?? '') == $jenis->id ? 'selected' : '' }}>
-                                            {{ $jenis->jenis }}
+                                    <option value="">Pilih Perdata</option>
+                                    @foreach ($pihakMenghadirkan as $jenis)
+                                        <option value="{{ $jenis->id }}|{{ $jenis->id_pihak }}"
+                                            {{ old('id_pihak', $saksi->id_pihak ?? '') == $jenis->id_pihak ? 'selected' : '' }}>
+                                            {{ $jenis->pihak->jenis ?? 'Tanpa Jenis' }} : {{ $jenis->nama }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -243,6 +243,7 @@
             });
         @endif
     </script>
+
 </body>
 
 </html>
